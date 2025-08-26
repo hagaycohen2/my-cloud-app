@@ -1,0 +1,15 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build','-t','europe-west1-docker.pkg.dev/$PROJECT_ID/app-repo/web:$SHORT_SHA','.']
+  - name: gcr.io/cloud-builders/docker
+    args: ['push','europe-west1-docker.pkg.dev/$PROJECT_ID/app-repo/web:$SHORT_SHA']
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      ['run','deploy','web-api-prod',
+       '--image','europe-west1-docker.pkg.dev/$PROJECT_ID/app-repo/web:$SHORT_SHA',
+       '--platform','managed','--region','europe-west1',
+       '--allow-unauthenticated',
+       '--set-env-vars','ENV=prod']
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/app-repo/web:$SHORT_SHA'
